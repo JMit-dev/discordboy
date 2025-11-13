@@ -107,16 +107,22 @@ class GameBoyBot(commands.Bot):
             rom_path = Config.get_rom_path(rom_name)
             self.emulator = GameBoyEmulator(rom_path, Config.GAME_SPEED)
 
-            # Initialize controller
-            self.controller = InputController(self.emulator)
+            # Initialize controller with update callback
+            self.controller = InputController(self.emulator, self._update_screen)
             await self.controller.start()
 
-            # Start game loop
+            # Start game loop (or just post initial screen if input-driven)
             self.is_running = True
             self.current_rom = rom_name
             self.start_time = time.time()
             self.input_count = 0
-            self.game_loop_task = asyncio.create_task(self._game_loop())
+
+            if Config.INPUT_DRIVEN:
+                # Just post initial screen, updates happen on input
+                await self._update_screen()
+            else:
+                # Start continuous game loop
+                self.game_loop_task = asyncio.create_task(self._game_loop())
 
             logger.info(f"Game started: {rom_name}")
             return True
@@ -210,6 +216,44 @@ class GameBoyBot(commands.Bot):
             logger.error(f"Error in game loop: {e}")
             await self._send_error(f"Game loop error: {str(e)}")
             self.is_running = False
+
+    async def _update_screen(self):
+        """Update the game screenshot (used in input-driven mode)."""
+        try:
+            # Tick emulator a few frames
+            self.emulator.tick(30)  # Half second of gameplay
+
+            # Capture screenshot
+            overlay_text = f"{format_game_name(self.current_rom)}"
+            screenshot = await capture_screenshot(self.emulator, overlay_text)
+
+            # Post or update message
+            file = discord.File(screenshot, filename="game.png")
+
+            if not self.current_message:
+                # First message - create it
+                self.current_message = await self.game_channel.send(file=file)
+
+                # Add reaction controls only once
+                for emoji in Config.CONTROL_EMOJIS:
+                    try:
+                        await self.current_message.add_reaction(emoji)
+                    except Exception as e:
+                        logger.error(f"Failed to add reaction {emoji}: {e}")
+            else:
+                # Update by deleting and reposting
+                try:
+                    await self.current_message.delete()
+                except:
+                    pass
+
+                self.current_message = await self.game_channel.send(file=file)
+
+                # Re-add reactions in background
+                asyncio.create_task(self._add_reactions(self.current_message))
+
+        except Exception as e:
+            logger.error(f"Error updating screen: {e}")
 
     async def _add_reactions(self, message: discord.Message):
         """Add control reactions to a message (background task)."""

@@ -32,6 +32,7 @@ class Config:
     UPDATE_INTERVAL = float(os.getenv("UPDATE_INTERVAL", "2.0"))
     GAME_SPEED = int(os.getenv("GAME_SPEED", "1"))
     DEFAULT_ROM = os.getenv("DEFAULT_ROM", "game.gb")
+    INPUT_DRIVEN = os.getenv("INPUT_DRIVEN", "true").lower() == "true"  # Only update on input
 
     # Paths
     PROJECT_ROOT = Path(__file__).parent.parent

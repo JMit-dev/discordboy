@@ -14,17 +14,19 @@ logger = logging.getLogger(__name__)
 class InputController:
     """Handles input processing from Discord reactions to Game Boy controls."""
 
-    def __init__(self, emulator: GameBoyEmulator):
+    def __init__(self, emulator: GameBoyEmulator, update_callback=None):
         """Initialize the input controller.
 
         Args:
             emulator: GameBoyEmulator instance to send inputs to
+            update_callback: Optional async callback to trigger screen updates
         """
         self.emulator = emulator
         self.input_queue: asyncio.Queue = asyncio.Queue()
         self.user_last_input: Dict[int, float] = {}  # Track rate limiting per user
         self.processing_task: Optional[asyncio.Task] = None
         self.is_running = False
+        self.update_callback = update_callback
 
     async def start(self):
         """Start the input processing task."""
@@ -121,6 +123,10 @@ class InputController:
 
             # Release button
             self.emulator.release_button(button)
+
+            # Trigger screen update if in input-driven mode
+            if Config.INPUT_DRIVEN and self.update_callback:
+                await self.update_callback()
 
             # Small delay between inputs
             await asyncio.sleep(0.05)
