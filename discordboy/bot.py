@@ -80,14 +80,6 @@ class GameBoyBot(commands.Bot):
         await self.controller.handle_reaction(emoji, user)
         self.input_count += 1
 
-        # Remove reaction for cleaner interface
-        try:
-            await reaction.remove(user)
-        except discord.Forbidden:
-            pass
-        except Exception as e:
-            logger.debug(f"Could not remove reaction: {e}")
-
     async def _start_game(self, rom_name: str) -> bool:
         """Internal method to start a game.
 
@@ -227,30 +219,22 @@ class GameBoyBot(commands.Bot):
             overlay_text = f"{format_game_name(self.current_rom)}"
             screenshot = await capture_screenshot(self.emulator, overlay_text)
 
-            # Post or update message
-            file = discord.File(screenshot, filename="game.png")
-
-            if not self.current_message:
-                # First message - create it
-                self.current_message = await self.game_channel.send(file=file)
-
-                # Add reaction controls only once
-                for emoji in Config.CONTROL_EMOJIS:
-                    try:
-                        await self.current_message.add_reaction(emoji)
-                    except Exception as e:
-                        logger.error(f"Failed to add reaction {emoji}: {e}")
-            else:
-                # Update by deleting and reposting
+            # Delete old message before posting new one
+            if self.current_message:
                 try:
                     await self.current_message.delete()
                 except:
                     pass
 
-                self.current_message = await self.game_channel.send(file=file)
+            # Post new message
+            file = discord.File(screenshot, filename="game.png")
+            new_message = await self.game_channel.send(file=file)
 
-                # Re-add reactions in background
-                asyncio.create_task(self._add_reactions(self.current_message))
+            # Track as current message for reactions
+            self.current_message = new_message
+
+            # Add reactions to the new message (don't wait, do in background)
+            asyncio.create_task(self._add_reactions(new_message))
 
         except Exception as e:
             logger.error(f"Error updating screen: {e}")
