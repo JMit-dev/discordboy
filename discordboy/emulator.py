@@ -44,10 +44,10 @@ class GameBoyEmulator:
         """Initialize PyBoy instance."""
         try:
             # Initialize PyBoy in headless mode (no window)
+            # Using 'window' instead of deprecated 'window_type'
             self.pyboy = PyBoy(
                 str(self.rom_path),
-                window_type="headless",
-                disable_input=False,
+                window="headless",
             )
             self.pyboy.set_emulation_speed(self.speed)
             logger.info(f"Initialized emulator with ROM: {self.rom_path.name}")
