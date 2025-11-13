@@ -176,25 +176,30 @@ class GameBoyBot(commands.Bot):
                 overlay_text = f"{format_game_name(self.current_rom)}"
                 screenshot = await capture_screenshot(self.emulator, overlay_text)
 
-                # Delete old message
-                if self.current_message:
+                # Post or edit message with new screenshot
+                file = discord.File(screenshot, filename="game.png")
+
+                if not self.current_message:
+                    # First message - create it
+                    self.current_message = await self.game_channel.send(file=file)
+
+                    # Add reaction controls only once
+                    for emoji in Config.CONTROL_EMOJIS:
+                        try:
+                            await self.current_message.add_reaction(emoji)
+                        except Exception as e:
+                            logger.error(f"Failed to add reaction {emoji}: {e}")
+                else:
+                    # Update by deleting and reposting (Discord doesn't allow editing attachments)
                     try:
                         await self.current_message.delete()
-                    except discord.NotFound:
+                    except:
                         pass
-                    except Exception as e:
-                        logger.debug(f"Could not delete message: {e}")
 
-                # Post new screenshot
-                file = discord.File(screenshot, filename="game.png")
-                self.current_message = await self.game_channel.send(file=file)
+                    self.current_message = await self.game_channel.send(file=file)
 
-                # Add reaction controls
-                for emoji in Config.CONTROL_EMOJIS:
-                    try:
-                        await self.current_message.add_reaction(emoji)
-                    except Exception as e:
-                        logger.error(f"Failed to add reaction {emoji}: {e}")
+                    # Re-add reactions (do this in background to avoid blocking)
+                    asyncio.create_task(self._add_reactions(self.current_message))
 
                 # Wait for next update
                 await asyncio.sleep(Config.UPDATE_INTERVAL)
@@ -205,6 +210,15 @@ class GameBoyBot(commands.Bot):
             logger.error(f"Error in game loop: {e}")
             await self._send_error(f"Game loop error: {str(e)}")
             self.is_running = False
+
+    async def _add_reactions(self, message: discord.Message):
+        """Add control reactions to a message (background task)."""
+        for emoji in Config.CONTROL_EMOJIS:
+            try:
+                await message.add_reaction(emoji)
+                await asyncio.sleep(0.25)  # Small delay to avoid rate limits
+            except Exception as e:
+                logger.debug(f"Failed to add reaction {emoji}: {e}")
 
     async def _send_error(self, error_message: str):
         """Send an error message to the game channel."""
