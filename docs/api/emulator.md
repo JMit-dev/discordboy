@@ -1,0 +1,3 @@
+# Emulator Module
+
+::: discordboy.emulator

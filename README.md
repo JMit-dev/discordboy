@@ -1,5 +1,12 @@
 # Discord Game Boy Bot
 
+[![CI](https://github.com/yourusername/discordboy/workflows/CI/badge.svg)](https://github.com/yourusername/discordboy/actions)
+[![codecov](https://codecov.io/gh/yourusername/discordboy/branch/main/graph/badge.svg)](https://codecov.io/gh/yourusername/discordboy)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![License: GPL-3.0](https://img.shields.io/badge/License-GPL%203.0-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
+[![Discord.py](https://img.shields.io/badge/discord.py-2.4.0+-blue.svg)](https://github.com/Rapptz/discord.py)
+
 A Discord bot that runs a Game Boy emulator and allows users to play games collectively by reacting with emojis to control the game.
 
 ## Motivation
@@ -37,6 +44,9 @@ source venv/bin/activate  # Windows: venv\Scripts\activate
 # Install dependencies
 pip install -e .
 
+# Install development dependencies (optional)
+pip install -e ".[dev]"
+
 # Create configuration
 cp .env.example .env
 # Edit .env with your Discord bot token and channel ID
@@ -72,6 +82,40 @@ python -m discordboy
 - `/games` - List available games
 - `/help` - Show controls
 - `/stats` - View game statistics
+
+## Development
+
+### Running Tests
+
+```bash
+# Install dev dependencies
+pip install -e ".[dev]"
+
+# Run tests
+pytest
+
+# Run tests with coverage
+pytest --cov=discordboy --cov-report=html
+
+# Run linting
+ruff check .
+
+# Run formatting
+ruff format .
+```
+
+### Pre-commit Hooks
+
+```bash
+# Install pre-commit
+pip install pre-commit
+
+# Set up hooks
+pre-commit install
+
+# Run manually
+pre-commit run --all-files
+```
 
 ## Credits
 

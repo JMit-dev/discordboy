@@ -3,21 +3,22 @@
 import asyncio
 import logging
 import time
-from typing import Optional
+
 import discord
 from discord.ext import commands
-from discordboy.emulator import GameBoyEmulator
-from discordboy.controller import InputController
-from discordboy.screenshot import capture_screenshot, create_error_image
+
 from discordboy.config import Config
+from discordboy.controller import InputController
+from discordboy.emulator import GameBoyEmulator
+from discordboy.screenshot import capture_screenshot, create_error_image
 from discordboy.utils import (
+    create_embed,
+    format_game_name,
+    format_uptime,
+    get_save_list,
+    is_admin,
     load_rom_list,
     validate_rom,
-    is_admin,
-    format_game_name,
-    create_embed,
-    get_save_list,
-    format_uptime,
 )
 
 logger = logging.getLogger(__name__)
@@ -35,14 +36,14 @@ class GameBoyBot(commands.Bot):
 
         super().__init__(command_prefix="/", intents=intents)
 
-        self.emulator: Optional[GameBoyEmulator] = None
-        self.controller: Optional[InputController] = None
-        self.game_channel: Optional[discord.TextChannel] = None
-        self.current_message: Optional[discord.Message] = None
-        self.game_loop_task: Optional[asyncio.Task] = None
+        self.emulator: GameBoyEmulator | None = None
+        self.controller: InputController | None = None
+        self.game_channel: discord.TextChannel | None = None
+        self.current_message: discord.Message | None = None
+        self.game_loop_task: asyncio.Task | None = None
         self.is_running = False
-        self.current_rom: Optional[str] = None
-        self.start_time: Optional[float] = None
+        self.current_rom: str | None = None
+        self.start_time: float | None = None
         self.input_count = 0
 
     async def setup_hook(self):
@@ -150,7 +151,7 @@ class GameBoyBot(commands.Bot):
             if self.current_message:
                 try:
                     await self.current_message.delete()
-                except:
+                except Exception:
                     pass
                 self.current_message = None
 
@@ -191,7 +192,7 @@ class GameBoyBot(commands.Bot):
                     # Update by deleting and reposting (Discord doesn't allow editing attachments)
                     try:
                         await self.current_message.delete()
-                    except:
+                    except Exception:
                         pass
 
                     self.current_message = await self.game_channel.send(file=file)
@@ -223,7 +224,7 @@ class GameBoyBot(commands.Bot):
             if self.current_message:
                 try:
                     await self.current_message.delete()
-                except:
+                except Exception:
                     pass
 
             # Post new message
@@ -279,7 +280,7 @@ class GameBoyBot(commands.Bot):
             embed = create_embed(
                 "🎮 Game Started",
                 f"Now playing: **{format_game_name(rom_name)}**",
-                discord.Color.green()
+                discord.Color.green(),
             )
             await ctx.send(embed=embed)
         else:
@@ -297,11 +298,7 @@ class GameBoyBot(commands.Bot):
             return
 
         await self._stop_game()
-        embed = create_embed(
-            "🛑 Game Stopped",
-            "The game has been stopped.",
-            discord.Color.red()
-        )
+        embed = create_embed("🛑 Game Stopped", "The game has been stopped.", discord.Color.red())
         await ctx.send(embed=embed)
 
     @commands.command(name="speed")
@@ -327,9 +324,7 @@ class GameBoyBot(commands.Bot):
         Config.GAME_SPEED = speed
 
         embed = create_embed(
-            "⚡ Speed Changed",
-            f"Emulator speed set to **{speed}x**",
-            discord.Color.blue()
+            "⚡ Speed Changed", f"Emulator speed set to **{speed}x**", discord.Color.blue()
         )
         await ctx.send(embed=embed)
 
@@ -346,9 +341,7 @@ class GameBoyBot(commands.Bot):
 
         self.emulator.reset()
         embed = create_embed(
-            "🔄 Game Reset",
-            "The game has been reset to the beginning.",
-            discord.Color.orange()
+            "🔄 Game Reset", "The game has been reset to the beginning.", discord.Color.orange()
         )
         await ctx.send(embed=embed)
 
@@ -371,9 +364,7 @@ class GameBoyBot(commands.Bot):
             self.emulator.save_state(save_path)
 
             embed = create_embed(
-                "💾 State Saved",
-                f"Game state saved as: **{save_name}**",
-                discord.Color.green()
+                "💾 State Saved", f"Game state saved as: **{save_name}**", discord.Color.green()
             )
             await ctx.send(embed=embed)
         except Exception as e:
@@ -403,9 +394,7 @@ class GameBoyBot(commands.Bot):
             self.emulator.load_state(save_path)
 
             embed = create_embed(
-                "📂 State Loaded",
-                f"Loaded game state: **{save_name}**",
-                discord.Color.blue()
+                "📂 State Loaded", f"Loaded game state: **{save_name}**", discord.Color.blue()
             )
             await ctx.send(embed=embed)
         except Exception as e:
@@ -422,11 +411,7 @@ class GameBoyBot(commands.Bot):
 
         game_list = "\n".join([f"• {format_game_name(rom)} (`{rom}`)" for rom in roms])
 
-        embed = create_embed(
-            "🎮 Available Games",
-            game_list,
-            discord.Color.blue()
-        )
+        embed = create_embed("🎮 Available Games", game_list, discord.Color.blue())
         await ctx.send(embed=embed)
 
     @commands.command(name="help")
@@ -456,11 +441,7 @@ React with emojis on the game screenshot to control the game!
 `/help` - Show this help message
 """
 
-        embed = create_embed(
-            "ℹ️ Game Boy Bot Help",
-            help_text,
-            discord.Color.blue()
-        )
+        embed = create_embed("ℹ️ Game Boy Bot Help", help_text, discord.Color.blue())
         await ctx.send(embed=embed)
 
     @commands.command(name="stats")
@@ -481,12 +462,7 @@ React with emojis on the game screenshot to control the game!
             ("Queue Size", str(queue_size), True),
         ]
 
-        embed = create_embed(
-            "📊 Game Statistics",
-            "",
-            discord.Color.blue(),
-            fields
-        )
+        embed = create_embed("📊 Game Statistics", "", discord.Color.blue(), fields)
         await ctx.send(embed=embed)
 
 

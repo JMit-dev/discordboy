@@ -1,0 +1,3 @@
+# Controller Module
+
+::: discordboy.controller

@@ -1,11 +1,11 @@
 """PyBoy emulator wrapper for Game Boy emulation."""
 
+import logging
 from pathlib import Path
-from typing import Optional
+
 from PIL import Image
 from pyboy import PyBoy
 from pyboy.utils import WindowEvent
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +37,7 @@ class GameBoyEmulator:
 
         self.rom_path = rom_path
         self.speed = speed
-        self.pyboy: Optional[PyBoy] = None
+        self.pyboy: PyBoy | None = None
         self._initialize()
 
     def _initialize(self):

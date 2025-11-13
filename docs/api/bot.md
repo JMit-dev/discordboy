@@ -1,0 +1,3 @@
+# Bot Module
+
+::: discordboy.bot

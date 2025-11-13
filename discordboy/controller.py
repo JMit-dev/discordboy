@@ -1,12 +1,13 @@
 """Input controller for mapping emoji reactions to Game Boy controls."""
 
 import asyncio
-import time
 import logging
-from typing import Dict, Optional
+import time
+
 import discord
-from discordboy.emulator import GameBoyEmulator
+
 from discordboy.config import Config
+from discordboy.emulator import GameBoyEmulator
 
 logger = logging.getLogger(__name__)
 
@@ -23,8 +24,8 @@ class InputController:
         """
         self.emulator = emulator
         self.input_queue: asyncio.Queue = asyncio.Queue()
-        self.user_last_input: Dict[int, float] = {}  # Track rate limiting per user
-        self.processing_task: Optional[asyncio.Task] = None
+        self.user_last_input: dict[int, float] = {}  # Track rate limiting per user
+        self.processing_task: asyncio.Task | None = None
         self.is_running = False
         self.update_callback = update_callback
 
@@ -87,9 +88,7 @@ class InputController:
         while self.is_running:
             try:
                 # Wait for next input with timeout
-                emoji, user = await asyncio.wait_for(
-                    self.input_queue.get(), timeout=1.0
-                )
+                emoji, user = await asyncio.wait_for(self.input_queue.get(), timeout=1.0)
                 await self._process_input(emoji, user)
             except asyncio.TimeoutError:
                 # No input received, continue loop

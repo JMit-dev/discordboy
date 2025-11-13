@@ -2,14 +2,15 @@
 
 import logging
 from pathlib import Path
-from typing import List, Optional
+
 import discord
+
 from discordboy.config import Config
 
 logger = logging.getLogger(__name__)
 
 
-def load_rom_list() -> List[str]:
+def load_rom_list() -> list[str]:
     """Scan games directory for available ROM files.
 
     Returns:
@@ -126,7 +127,7 @@ def create_embed(
     title: str,
     description: str,
     color: discord.Color = discord.Color.blue(),
-    fields: Optional[List[tuple]] = None
+    fields: list[tuple] | None = None,
 ) -> discord.Embed:
     """Create a Discord embed message.
 
@@ -139,11 +140,7 @@ def create_embed(
     Returns:
         Discord Embed object
     """
-    embed = discord.Embed(
-        title=title,
-        description=description,
-        color=color
-    )
+    embed = discord.Embed(title=title, description=description, color=color)
 
     if fields:
         for field_name, field_value, inline in fields:
@@ -152,7 +149,7 @@ def create_embed(
     return embed
 
 
-def get_save_list() -> List[str]:
+def get_save_list() -> list[str]:
     """Get list of available save state files.
 
     Returns:
@@ -206,5 +203,5 @@ def setup_logging(level: int = logging.INFO):
     logging.basicConfig(
         level=level,
         format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S"
+        datefmt="%Y-%m-%d %H:%M:%S",
     )

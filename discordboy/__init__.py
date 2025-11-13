@@ -8,8 +8,8 @@ __version__ = "0.1.0"
 __author__ = "Discord GameBoy Bot"
 
 from discordboy.bot import GameBoyBot
-from discordboy.emulator import GameBoyEmulator
-from discordboy.controller import InputController
 from discordboy.config import Config
+from discordboy.controller import InputController
+from discordboy.emulator import GameBoyEmulator
 
 __all__ = ["GameBoyBot", "GameBoyEmulator", "InputController", "Config"]

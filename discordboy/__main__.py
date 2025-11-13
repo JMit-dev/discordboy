@@ -2,6 +2,7 @@
 
 import asyncio
 import sys
+
 from discordboy.bot import run_bot
 from discordboy.utils import setup_logging
 

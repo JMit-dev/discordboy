@@ -2,9 +2,11 @@
 
 import io
 import logging
+
 from PIL import Image, ImageDraw, ImageFont
-from discordboy.emulator import GameBoyEmulator
+
 from discordboy.config import Config
+from discordboy.emulator import GameBoyEmulator
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +65,7 @@ def add_overlay(image: Image.Image, text: str) -> Image.Image:
         # Try to use a nice font, fall back to default if not available
         try:
             font = ImageFont.truetype("arial.ttf", 16)
-        except:
+        except OSError:
             font = ImageFont.load_default()
 
         # Calculate text position (bottom right corner with padding)
@@ -77,12 +79,7 @@ def add_overlay(image: Image.Image, text: str) -> Image.Image:
         y = image.height - text_height - padding
 
         # Draw background rectangle for better readability
-        background_bbox = [
-            x - 5,
-            y - 5,
-            x + text_width + 5,
-            y + text_height + 5
-        ]
+        background_bbox = [x - 5, y - 5, x + text_width + 5, y + text_height + 5]
         draw.rectangle(background_bbox, fill=(0, 0, 0, 180))
 
         # Draw text in white
@@ -96,7 +93,9 @@ def add_overlay(image: Image.Image, text: str) -> Image.Image:
         return image
 
 
-def add_border(image: Image.Image, border_color: tuple = (50, 50, 50), border_width: int = 10) -> Image.Image:
+def add_border(
+    image: Image.Image, border_color: tuple = (50, 50, 50), border_width: int = 10
+) -> Image.Image:
     """Add a border around the image.
 
     Args:
@@ -140,7 +139,7 @@ async def create_error_image(error_message: str) -> io.BytesIO:
         # Try to load a font
         try:
             font = ImageFont.truetype("arial.ttf", 20)
-        except:
+        except OSError:
             font = ImageFont.load_default()
 
         # Draw error message

@@ -1,0 +1,77 @@
+site_name: Discord Game Boy Bot
+site_description: A Discord bot that runs a Game Boy emulator for collective gameplay
+site_author: Discord GameBoy Bot Team
+site_url: https://github.com/yourusername/discordboy
+
+repo_name: discordboy
+repo_url: https://github.com/yourusername/discordboy
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            show_source: true
+            show_root_heading: true
+            show_category_heading: true
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.details
+  - admonition
+  - tables
+  - attr_list
+  - md_in_html
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Installation: getting-started/installation.md
+      - Configuration: getting-started/configuration.md
+      - Deployment: getting-started/deployment.md
+  - User Guide:
+      - Commands: user-guide/commands.md
+      - Controls: user-guide/controls.md
+      - Playing Games: user-guide/playing.md
+  - API Reference:
+      - Bot: api/bot.md
+      - Emulator: api/emulator.md
+      - Controller: api/controller.md
+      - Config: api/config.md
+      - Utils: api/utils.md
+  - Development:
+      - Contributing: development/contributing.md
+      - Testing: development/testing.md
+      - Architecture: development/architecture.md

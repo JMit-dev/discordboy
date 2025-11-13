@@ -1,0 +1,66 @@
+# Ruff configuration for discordboy
+# https://docs.astral.sh/ruff/
+
+# Exclude common directories
+exclude = [
+    ".git",
+    ".venv",
+    "venv",
+    "__pycache__",
+    "build",
+    "dist",
+    "*.egg-info",
+]
+
+# Set line length
+line-length = 100
+
+# Target Python 3.10+
+target-version = "py310"
+
+[lint]
+# Enable specific rule sets
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort (import sorting)
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "A",   # flake8-builtins
+    "C4",  # flake8-comprehensions
+    "PT",  # flake8-pytest-style
+    "SIM", # flake8-simplify
+    "RET", # flake8-return
+]
+
+# Ignore specific rules
+ignore = [
+    "E501",   # Line too long (handled by formatter)
+    "B008",   # Do not perform function calls in argument defaults
+    "UP007",  # Use X | Y for type annotations (we use Optional for clarity)
+    "SIM105", # Use contextlib.suppress (try/except is clearer)
+    "SIM108", # Use ternary operator (if/else is clearer)
+    "RET504", # Unnecessary assignment before return (we prefer clarity)
+]
+
+# Allow autofix for all enabled rules
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables when underscore-prefixed
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[format]
+# Use double quotes for strings
+quote-style = "double"
+
+# Indent with spaces
+indent-style = "space"
+
+# Respect magic trailing commas
+skip-magic-trailing-comma = false
+
+# Automatically detect line endings
+line-ending = "auto"
