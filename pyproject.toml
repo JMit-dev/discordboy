@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=68.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "discordboy"
+version = "0.1.0"
+description = "A Discord bot that runs a Game Boy emulator and allows users to play games collectively"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "Discord GameBoy Bot"}
+]
+dependencies = [
+    "discord.py>=2.4.0",
+    "pyboy>=2.4.1",
+    "Pillow>=11.0.0",
+    "python-dotenv>=1.0.1",
+    "aiofiles>=24.1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "black>=23.7.0",
+    "flake8>=6.1.0",
+]
+
+[project.scripts]
+discordboy = "discordboy.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["discordboy*"]
+
+[tool.black]
+line-length = 100
+target-version = ['py310']
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
