@@ -110,9 +110,9 @@ class GameBoyEmulator:
         if not self.pyboy:
             raise RuntimeError("Emulator not initialized")
 
-        # Get screen buffer from PyBoy
-        screen_array = self.pyboy.screen_image()
-        return screen_array
+        # Get screen buffer from PyBoy (using screen property in v2.x)
+        screen_image = self.pyboy.screen.image
+        return screen_image
 
     def save_state(self, path: Path):
         """Save emulator state to file.
