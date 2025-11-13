@@ -47,17 +47,6 @@ class GameBoyBot(commands.Bot):
 
     async def setup_hook(self):
         """Set up bot commands."""
-        # Register commands
-        self.add_command(self.start_game)
-        self.add_command(self.stop_game)
-        self.add_command(self.set_speed)
-        self.add_command(self.reset_game)
-        self.add_command(self.savestate)
-        self.add_command(self.loadstate)
-        self.add_command(self.games)
-        self.add_command(self.help_command)
-        self.add_command(self.stats)
-
         logger.info("Bot setup completed")
 
     async def on_ready(self):
