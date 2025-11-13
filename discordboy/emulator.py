@@ -3,7 +3,8 @@
 from pathlib import Path
 from typing import Optional
 from PIL import Image
-from pyboy import PyBoy, WindowEvent
+from pyboy import PyBoy
+from pyboy.utils import WindowEvent
 import logging
 
 logger = logging.getLogger(__name__)
