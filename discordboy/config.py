@@ -13,8 +13,20 @@ class Config:
 
     # Discord Configuration
     DISCORD_BOT_TOKEN = os.getenv("DISCORD_BOT_TOKEN")
-    GAME_CHANNEL_ID = int(os.getenv("GAME_CHANNEL_ID", 0))
-    ADMIN_ROLE_ID = int(os.getenv("ADMIN_ROLE_ID", 0)) if os.getenv("ADMIN_ROLE_ID") else None
+
+    # Parse GAME_CHANNEL_ID safely
+    _channel_id = os.getenv("GAME_CHANNEL_ID", "0")
+    try:
+        GAME_CHANNEL_ID = int(_channel_id) if _channel_id.isdigit() else 0
+    except (ValueError, AttributeError):
+        GAME_CHANNEL_ID = 0
+
+    # Parse ADMIN_ROLE_ID safely
+    _admin_role = os.getenv("ADMIN_ROLE_ID")
+    if _admin_role and _admin_role.isdigit():
+        ADMIN_ROLE_ID = int(_admin_role)
+    else:
+        ADMIN_ROLE_ID = None
 
     # Game Configuration
     UPDATE_INTERVAL = float(os.getenv("UPDATE_INTERVAL", "2.0"))
